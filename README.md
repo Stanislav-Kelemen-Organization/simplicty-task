@@ -1,50 +1,45 @@
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Test assignment for Simplicity
 
 ## Project setup
 
+1. Install dependencies from package-lock.json
+```bash 
+  npm ci
+```
+2. Install and start [Docker](https://docs.docker.com/compose/install/)
+3. Start container and check its status
 ```bash
-$ npm install
+  docker-compose up -d
+  docker ps
+ ```
+4. Run migrations 
+```bash 
+  npm run migrations:run
+```
+5. Seed database for testing
+```bash 
+  npm run db:seed
+```
+6. Run project in DEV mode
+```bash 
+  npm run start:dev
 ```
 
-## Compile and run the project
+## Endpoints
 
-```bash
-# development
-$ npm run start
+GraphQL allows schema introspection and endpoints overview.  
+For endpoints documentation and testing use [Postman](https://www.postman.com/downloads/) or [Apollo Sandbox](https://studio.apollographql.com/sandbox/explorer)
 
-# watch mode
-$ npm run start:dev
 
-# production mode
-$ npm run start:prod
+--------
+Produced By
 ```
-
-## Run tests
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+ ___  ____   _____     ____    ____  ____  _____  
+|_  ||_  _| |_   _|   |_   \  /   _||_   \|_   _| 
+  | |_/ /     | |       |   \/   |    |   \ | |   
+  |  __'.     | |   _   | |\  /| |    | |\ \| |   
+ _| |  \ \_  _| |__/ | _| |_\/_| |_  _| |_\   |_  
+|____||____||________||_____||_____||_____|\____| 
 ```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-

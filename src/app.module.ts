@@ -20,8 +20,8 @@ import { CategoriesModule } from './api/categories/categories.module';
         }),
         GraphQLModule.forRoot<ApolloDriverConfig>({
             driver: ApolloDriver,
-            playground: true,
-            autoSchemaFile: true,
+            introspection: true,
+            autoSchemaFile: 'schema.graphql',
         }),
         AnnouncementsModule,
         CategoriesModule,
