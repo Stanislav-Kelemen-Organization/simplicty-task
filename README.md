@@ -18,7 +18,7 @@ Test assignment for Simplicity
 ```bash 
   npm run migrations:run
 ```
-5. Seed database for testing
+5. Seed database with showcase data
 ```bash 
   npm run db:seed
 ```
