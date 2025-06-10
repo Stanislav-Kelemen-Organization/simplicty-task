@@ -1,36 +1,44 @@
-import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { Category } from './category.model';
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    JoinTable,
+    ManyToMany,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn,
+} from 'typeorm';
+import { Category } from '../../categories/models/category.model';
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 
 @Entity()
 @ObjectType()
 export class Announcement {
-  @PrimaryGeneratedColumn()
-  @Field(() => Int)
-  id: number;
+    @PrimaryGeneratedColumn()
+    @Field(() => Int)
+    id: number;
 
-  @Field()
-  @Column({ type: 'varchar', length: 1000 })
-  title: string;
+    @Field()
+    @Column({ type: 'varchar', length: 1000 })
+    title: string;
 
-  @Field()
-  @Column({ type: 'text' })
-  content: string;
+    @Field()
+    @Column({ type: 'text' })
+    content: string;
 
-  @Field()
-  @Column({ type: 'timestamptz', nullable: true })
-  publishedAt: Date;
+    @Field()
+    @Column({ type: 'timestamptz', nullable: true })
+    publishedAt: Date;
 
-  @Field()
-  @CreateDateColumn({ type: 'timestamptz' })
-  createdAt: Date;
+    @Field()
+    @CreateDateColumn({ type: 'timestamptz' })
+    createdAt: Date;
 
-  @Field()
-  @UpdateDateColumn({ type: 'timestamptz' })
-  updatedAt: Date;
+    @Field()
+    @UpdateDateColumn({ type: 'timestamptz' })
+    updatedAt: Date;
 
-  @Field(() => [Category])
-  @ManyToMany(() => Category)
-  @JoinTable({ name: 'announcement_to_category' })
-  categories: Category[]
+    @Field(() => [Category])
+    @ManyToMany(() => Category)
+    @JoinTable({ name: 'announcement_to_category' })
+    categories: Category[];
 }
