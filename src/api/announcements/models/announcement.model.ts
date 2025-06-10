@@ -38,7 +38,7 @@ export class Announcement {
     updatedAt: Date;
 
     @Field(() => [Category])
-    @ManyToMany(() => Category)
+    @ManyToMany(() => Category, { eager: true })
     @JoinTable({ name: 'announcement_to_category' })
     categories: Category[];
 }

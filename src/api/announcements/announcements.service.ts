@@ -115,7 +115,6 @@ export class AnnouncementsService {
 
                 return transaction.findOneOrFail(Announcement, {
                     where: { id: announcement.id },
-                    relations: ['categories'],
                 });
             });
         } catch (error) {
