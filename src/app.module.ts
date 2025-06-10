@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { databaseConfiguration } from '../db/datasource';
 import { join } from 'path';
+import { AnnouncementsModule } from './api/announcements/announcements.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 
@@ -23,6 +24,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
       playground: true,
       autoSchemaFile: true
     }),
+    AnnouncementsModule
   ],
   controllers: [AppController],
   providers: [AppService],
