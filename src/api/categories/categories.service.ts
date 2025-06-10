@@ -1,4 +1,5 @@
 import {
+    BadRequestException,
     Injectable,
     InternalServerErrorException,
     Logger,
@@ -66,6 +67,10 @@ export class CategoriesService {
     }
 
     public async delete(id: number): Promise<boolean> {
+        if (!(await this.categoryRepository.exists({ where: { id } }))) {
+            throw new BadRequestException('Category does not exist');
+        }
+
         try {
             await this.categoryRepository.delete({ id });
         } catch (error) {

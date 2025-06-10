@@ -15,7 +15,7 @@ export class Category {
     id: number;
 
     @Field()
-    @Column({ type: 'varchar', length: 255 })
+    @Column({ type: 'varchar', length: 255, unique: true })
     name: string;
 
     @Field()

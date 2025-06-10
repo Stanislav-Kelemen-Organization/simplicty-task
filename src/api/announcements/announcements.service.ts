@@ -80,7 +80,6 @@ export class AnnouncementsService {
 
                 return transaction.findOneOrFail(Announcement, {
                     where: { id },
-                    relations: ['categories'],
                 });
             });
         } catch (error) {
@@ -106,7 +105,7 @@ export class AnnouncementsService {
                   })
                 : null;
 
-            return this.dataSource.transaction(async (transaction) => {
+            return await this.dataSource.transaction(async (transaction) => {
                 await transaction.save(Announcement, {
                     ...announcement,
                     updatedAt: new Date(),
@@ -127,6 +126,10 @@ export class AnnouncementsService {
     }
 
     public async delete(id: number): Promise<boolean> {
+        if (!(await this.announcementRepository.exists({ where: { id } }))) {
+            throw new BadRequestException('Announcement does not exist');
+        }
+
         try {
             await this.announcementRepository.delete({ id });
         } catch (error) {
