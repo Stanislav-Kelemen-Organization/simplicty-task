@@ -6,8 +6,6 @@ import { ConfigModule } from '@nestjs/config';
 import { databaseConfiguration } from '../db/datasource';
 import { join } from 'path';
 
-console.log(__dirname, '----__dirname----')
-
 @Module({
   imports: [
     ConfigModule.forRoot({

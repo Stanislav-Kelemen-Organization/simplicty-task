@@ -26,7 +26,7 @@ export const databaseConfiguration: DataSourceOptions = {
 
 export default new DataSource({
   ...databaseConfiguration,
-  entities: [join(__dirname, '../src/**/*.model.ts')],
-  migrations:[ "d"],
+  entities: [join(__dirname, '..', 'src', '**', '*.model.ts')],
+  migrations:[join(__dirname, 'cli', 'migrations', '*.ts')],
 });
 
