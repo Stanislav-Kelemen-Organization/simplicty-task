@@ -3,15 +3,10 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
+import { databaseConfiguration } from '../db/datasource';
+import { join } from 'path';
 
-
-const {
-  DB_HOST: host,
-  DB_PORT: port,
-  DB_USER: username,
-  DB_PASSWORD: password,
-  DB_NAME: database,
-} = process.env;
+console.log(__dirname, '----__dirname----')
 
 @Module({
   imports: [
@@ -19,14 +14,9 @@ const {
       isGlobal: true,
     }),
     TypeOrmModule.forRoot({
-      type: 'postgres',
-      host,
-      port: parseInt(port || '5432', 10),
-      username,
-      password,
-      database,
-      entities: [],
-      synchronize: true,
+      ...databaseConfiguration,
+      autoLoadEntities: true,
+      entities: [join(__dirname, './**/*.model.ts')]
     }),
   ],
   controllers: [AppController],
