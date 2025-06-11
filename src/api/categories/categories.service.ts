@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 
@@ -8,8 +8,6 @@ import { UpdateCategoryInput } from './dto/update-category.input';
 
 @Injectable()
 export class CategoriesService {
-    private logger = new Logger(CategoriesService.name);
-
     constructor(
         @InjectRepository(Category)
         private categoryRepository: Repository<Category>,

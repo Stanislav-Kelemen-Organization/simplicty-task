@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Announcement } from './models';
 import { DataSource, Repository } from 'typeorm';
@@ -8,8 +8,6 @@ import { PaginationArgs } from '../../common/dto';
 
 @Injectable()
 export class AnnouncementsService {
-    private logger = new Logger(AnnouncementsService.name);
-
     constructor(
         @InjectRepository(Announcement)
         private announcementRepository: Repository<Announcement>,

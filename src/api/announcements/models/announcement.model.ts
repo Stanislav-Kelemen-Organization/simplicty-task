@@ -38,7 +38,11 @@ export class Announcement {
     updatedAt: Date;
 
     @Field(() => [Category])
-    @ManyToMany(() => Category, { eager: true })
+    @ManyToMany(() => Category, {
+        /* eager is used for the sake of simplicity, overfetching can be reduced by using graphql @ResolveField()
+        decorator on categories field + using DataLoader to avoid N + 1 problem */
+        eager: true,
+    })
     @JoinTable({ name: 'announcement_to_category' })
     categories: Category[];
 }

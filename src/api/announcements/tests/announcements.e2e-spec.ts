@@ -295,7 +295,7 @@ describe('Announcements (e2e)', () => {
             );
         });
 
-        it('should return error for non-existent announcement', async () => {
+        it('should throw error for non-existent announcement', async () => {
             const findOneAnnouncementQuery = print(gql`
                 query FindOneAnnouncement($id: Int!) {
                     announcement(id: $id) {

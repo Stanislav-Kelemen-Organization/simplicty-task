@@ -276,9 +276,5 @@ describe('CategoriesService', () => {
             expect(service['categoryRepository']).toBeDefined();
             expect(service['dataSource']).toBeDefined();
         });
-
-        it('should initialize logger correctly', () => {
-            expect(service['logger']).toBeDefined();
-        });
     });
 });
