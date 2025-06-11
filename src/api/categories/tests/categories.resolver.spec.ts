@@ -1,11 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { CategoriesResolver } from './categories.resolver';
-import { CategoriesService } from './categories.service';
-import { Category } from './models';
-import { CreateCategoryInput } from './dto';
-import { UpdateCategoryInput } from './dto/update-category.input';
-import { IdArgs } from '../../common/dto';
+import { CategoriesResolver } from '../categories.resolver';
+import { CategoriesService } from '../categories.service';
+import { Category } from '../models';
+import { CreateCategoryInput } from '../dto';
+import { UpdateCategoryInput } from '../dto/update-category.input';
+import { IdArgs } from '../../../common/dto';
 import { INestApplication } from '@nestjs/common';
+import { appSetup } from '../../../utils';
 
 describe('CategoriesResolver', () => {
     let app: INestApplication;
@@ -65,6 +66,8 @@ describe('CategoriesResolver', () => {
         app = module.createNestApplication({
             logger: false,
         });
+
+        appSetup(app);
 
         await app.init();
     });

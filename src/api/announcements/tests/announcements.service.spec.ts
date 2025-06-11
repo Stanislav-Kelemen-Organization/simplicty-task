@@ -3,18 +3,15 @@ import {
     getEntityManagerToken,
     getRepositoryToken,
 } from '@nestjs/typeorm';
-import { Announcement } from './models';
+import { Announcement } from '../models';
 import { Test, TestingModule } from '@nestjs/testing';
 import { DataSource, EntityManager, Repository } from 'typeorm';
-import { AnnouncementsResolver } from './announcements.resolver';
-import { AnnouncementsService } from './announcements.service';
-import {
-    BadRequestException,
-    INestApplication,
-    InternalServerErrorException,
-} from '@nestjs/common';
+import { AnnouncementsResolver } from '../announcements.resolver';
+import { AnnouncementsService } from '../announcements.service';
+import { INestApplication, NotFoundException } from '@nestjs/common';
 import { PaginationArgs } from 'src/common/dto';
-import { CreateAnnouncementInput, UpdateAnnouncementInput } from './dto';
+import { CreateAnnouncementInput, UpdateAnnouncementInput } from '../dto';
+import { appSetup } from '../../../utils';
 
 describe('AnnouncementsService', () => {
     let app: INestApplication;
@@ -85,6 +82,8 @@ describe('AnnouncementsService', () => {
             logger: false,
         });
 
+        appSetup(app);
+
         await app.init();
     });
 
@@ -106,16 +105,12 @@ describe('AnnouncementsService', () => {
             ).toHaveBeenCalledWith({ where: { id: 1 } });
         });
 
-        it('should throw InternalServerErrorException when repository throws error', async () => {
+        it('should throw error when repository throws error', async () => {
             const error = new Error('Database error');
             announcementRepository['findOneOrFail'].mockRejectedValue(error);
 
-            await expect(service.findOne(1)).rejects.toThrow(
-                InternalServerErrorException,
-            );
-            await expect(service.findOne(1)).rejects.toThrow(
-                'Announcement fetch failed',
-            );
+            await expect(service.findOne(1)).rejects.toThrow(error);
+            await expect(service.findOne(1)).rejects.toThrow('Database error');
         });
     });
 
@@ -141,15 +136,13 @@ describe('AnnouncementsService', () => {
             });
         });
 
-        it('should throw InternalServerErrorException when repository throws error', async () => {
+        it('should throw error when repository throws error', async () => {
             const error = new Error('Database error');
             announcementRepository['find'].mockRejectedValue(error);
 
+            await expect(service.find(paginationArgs)).rejects.toThrow(error);
             await expect(service.find(paginationArgs)).rejects.toThrow(
-                InternalServerErrorException,
-            );
-            await expect(service.find(paginationArgs)).rejects.toThrow(
-                'Announcements fetch failed',
+                'Database error',
             );
         });
     });
@@ -201,42 +194,13 @@ describe('AnnouncementsService', () => {
             );
         });
 
-        it('should throw BadRequestException when categoryIds is empty', async () => {
-            const inputWithoutCategories = {
-                ...createInput,
-                categoryIds: [],
-            };
-
-            await expect(
-                service.create(inputWithoutCategories),
-            ).rejects.toThrow(BadRequestException);
-            await expect(
-                service.create(inputWithoutCategories),
-            ).rejects.toThrow('Categories can not be empty');
-        });
-
-        it('should throw BadRequestException when categoryIds is undefined', async () => {
-            const inputWithoutCategories = {
-                ...createInput,
-                categoryIds: undefined,
-            };
-
-            await expect(
-                service.create(
-                    inputWithoutCategories as unknown as CreateAnnouncementInput,
-                ),
-            ).rejects.toThrow(BadRequestException);
-        });
-
-        it('should throw InternalServerErrorException when transaction fails', async () => {
+        it('should throw error when transaction fails', async () => {
             const error = new Error('Transaction error');
             dataSource['transaction'].mockRejectedValue(error);
 
+            await expect(service.create(createInput)).rejects.toThrow(error);
             await expect(service.create(createInput)).rejects.toThrow(
-                InternalServerErrorException,
-            );
-            await expect(service.create(createInput)).rejects.toThrow(
-                'Announcement creation failed',
+                'Transaction error',
             );
         });
     });
@@ -324,15 +288,13 @@ describe('AnnouncementsService', () => {
             );
         });
 
-        it('should throw InternalServerErrorException when transaction fails', async () => {
+        it('should throw error when transaction fails', async () => {
             const error = new Error('Transaction error');
             dataSource.transaction.mockRejectedValue(error);
 
+            await expect(service.update(updateInput)).rejects.toThrow(error);
             await expect(service.update(updateInput)).rejects.toThrow(
-                InternalServerErrorException,
-            );
-            await expect(service.update(updateInput)).rejects.toThrow(
-                'Announcement update failed',
+                'Transaction error',
             );
         });
     });
@@ -355,12 +317,10 @@ describe('AnnouncementsService', () => {
             expect(announcementRepository['delete']).toHaveBeenCalledTimes(1);
         });
 
-        it('should throw BadRequestException when announcement does not exists', async () => {
+        it('should throw error when announcement does not exists', async () => {
             announcementRepository['exists'].mockResolvedValue(false);
 
-            await expect(service.delete(1)).rejects.toThrow(
-                BadRequestException,
-            );
+            await expect(service.delete(1)).rejects.toThrow(NotFoundException);
             await expect(service.delete(1)).rejects.toThrow(
                 'Announcement does not exist',
             );
@@ -369,17 +329,15 @@ describe('AnnouncementsService', () => {
             });
         });
 
-        it('should throw InternalServerErrorException when deletion fails', async () => {
+        it('should throw error when deletion fails', async () => {
             const error = new Error('Foreign key constraint violation');
 
             announcementRepository['delete'].mockRejectedValue(error);
             announcementRepository['exists'].mockResolvedValue(true);
 
+            await expect(service.delete(1)).rejects.toThrow(error);
             await expect(service.delete(1)).rejects.toThrow(
-                InternalServerErrorException,
-            );
-            await expect(service.delete(1)).rejects.toThrow(
-                'Announcement deletion failed',
+                'Foreign key constraint violation',
             );
             expect(announcementRepository['delete']).toHaveBeenCalledWith({
                 id: 1,

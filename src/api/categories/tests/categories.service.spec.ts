@@ -1,15 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import {
-    BadRequestException,
-    INestApplication,
-    InternalServerErrorException,
-} from '@nestjs/common';
+import { INestApplication, NotFoundException } from '@nestjs/common';
 import { DataSource, EntityManager, Repository } from 'typeorm';
-import { CategoriesService } from './categories.service';
-import { Category } from './models';
-import { CreateCategoryInput } from './dto';
-import { UpdateCategoryInput } from './dto/update-category.input';
+import { CategoriesService } from '../categories.service';
+import { Category } from '../models';
+import { CreateCategoryInput } from '../dto';
+import { UpdateCategoryInput } from '../dto/update-category.input';
+import { appSetup } from '../../../utils';
 
 describe('CategoriesService', () => {
     let app: INestApplication;
@@ -39,6 +36,7 @@ describe('CategoriesService', () => {
         const mockTransactionManager = {
             save: jest.fn(),
             findOneOrFail: jest.fn(),
+            exists: jest.fn(),
         };
 
         const mockRepository = {
@@ -78,6 +76,8 @@ describe('CategoriesService', () => {
             logger: false,
         });
 
+        appSetup(app);
+
         await app.init();
     });
 
@@ -96,15 +96,13 @@ describe('CategoriesService', () => {
             expect(categoryRepository['find']).toHaveBeenCalledTimes(1);
         });
 
-        it('should throw InternalServerErrorException when repository throws error', async () => {
+        it('should throw error when repository throws error', async () => {
             const error = new Error('Database connection failed');
             categoryRepository['find'].mockRejectedValue(error);
 
+            await expect(service.find()).rejects.toThrow(error);
             await expect(service.find()).rejects.toThrow(
-                InternalServerErrorException,
-            );
-            await expect(service.find()).rejects.toThrow(
-                'Categories fetch failed',
+                'Database connection failed',
             );
             expect(categoryRepository['find']).toHaveBeenCalledWith();
         });
@@ -128,15 +126,13 @@ describe('CategoriesService', () => {
             expect(categoryRepository['save']).toHaveBeenCalledTimes(1);
         });
 
-        it('should throw InternalServerErrorException when save fails', async () => {
+        it('should throw error when save fails', async () => {
             const error = new Error('Duplicate key violation');
             categoryRepository['save'].mockRejectedValue(error);
 
+            await expect(service.create(createInput)).rejects.toThrow(error);
             await expect(service.create(createInput)).rejects.toThrow(
-                InternalServerErrorException,
-            );
-            await expect(service.create(createInput)).rejects.toThrow(
-                'Category creation failed',
+                'Duplicate key violation',
             );
             expect(categoryRepository['save']).toHaveBeenCalledWith(
                 createInput,
@@ -154,6 +150,7 @@ describe('CategoriesService', () => {
             const updatedCategory = { ...mockCategory, ...updateInput };
 
             transactionManager['save'].mockResolvedValue({ id: 1 });
+            transactionManager['exists'].mockResolvedValue(true);
             transactionManager['findOneOrFail'].mockResolvedValue(
                 updatedCategory,
             );
@@ -185,15 +182,13 @@ describe('CategoriesService', () => {
             );
         });
 
-        it('should throw InternalServerErrorException when transaction fails', async () => {
+        it('should throw error when transaction fails', async () => {
             const error = new Error('Transaction rollback');
             dataSource['transaction'].mockRejectedValue(error);
 
+            await expect(service.update(updateInput)).rejects.toThrow(error);
             await expect(service.update(updateInput)).rejects.toThrow(
-                InternalServerErrorException,
-            );
-            await expect(service.update(updateInput)).rejects.toThrow(
-                'Category update failed',
+                'Transaction rollback',
             );
             expect(dataSource['transaction']).toHaveBeenCalled();
         });
@@ -202,6 +197,7 @@ describe('CategoriesService', () => {
             const beforeUpdate = new Date();
 
             transactionManager['save'].mockResolvedValue({ id: 1 });
+            transactionManager['exists'].mockResolvedValue(true);
             transactionManager['findOneOrFail'].mockResolvedValue(mockCategory);
             dataSource['transaction'].mockImplementation((callback) =>
                 (
@@ -249,9 +245,7 @@ describe('CategoriesService', () => {
         it('should throw BadRequestException when category does not exists', async () => {
             categoryRepository['exists'].mockResolvedValue(false);
 
-            await expect(service.delete(1)).rejects.toThrow(
-                BadRequestException,
-            );
+            await expect(service.delete(1)).rejects.toThrow(NotFoundException);
             await expect(service.delete(1)).rejects.toThrow(
                 'Category does not exist',
             );
@@ -260,17 +254,15 @@ describe('CategoriesService', () => {
             });
         });
 
-        it('should throw InternalServerErrorException when deletion fails', async () => {
+        it('should throw error when deletion fails', async () => {
             const error = new Error('Foreign key constraint violation');
             categoryRepository['delete'].mockRejectedValue(error);
 
             categoryRepository['exists'].mockResolvedValue(true);
 
+            await expect(service.delete(1)).rejects.toThrow(error);
             await expect(service.delete(1)).rejects.toThrow(
-                InternalServerErrorException,
-            );
-            await expect(service.delete(1)).rejects.toThrow(
-                'Category deletion failed',
+                'Foreign key constraint violation',
             );
             expect(categoryRepository['delete']).toHaveBeenCalledWith({
                 id: 1,

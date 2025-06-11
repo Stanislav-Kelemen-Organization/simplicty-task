@@ -33,6 +33,12 @@ GraphQL allows schema introspection and endpoints overview.
 For endpoints documentation and testing use [Postman](https://www.postman.com/downloads/) or [Apollo Sandbox](https://studio.apollographql.com/sandbox/explorer)
 
 
+## Endpoints
+
+Unit tests: `npm run test`  
+E2E tests: `npm run test:e2e`  
+Test coverage: `npm run test:cov`
+
 --------
 Produced By
 ```

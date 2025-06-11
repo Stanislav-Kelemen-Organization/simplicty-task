@@ -1,13 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AnnouncementsResolver } from './announcements.resolver';
-import { AnnouncementsService } from './announcements.service';
-import { Announcement } from './models';
-import { Category } from '../categories/models';
-import { CreateAnnouncementInput, UpdateAnnouncementInput } from './dto';
-import { IdArgs, PaginationArgs } from '../../common/dto';
+import { AnnouncementsResolver } from '../announcements.resolver';
+import { AnnouncementsService } from '../announcements.service';
+import { Announcement } from '../models';
+import { Category } from '../../categories/models';
+import { CreateAnnouncementInput, UpdateAnnouncementInput } from '../dto';
+import { IdArgs, PaginationArgs } from '../../../common/dto';
 import { INestApplication } from '@nestjs/common';
+import { appSetup } from '../../../utils';
 
-describe('AnnouncementsResolver', () => {
+describe.only('AnnouncementsResolver', () => {
     let app: INestApplication;
     let resolver: AnnouncementsResolver;
     let service: jest.Mocked<AnnouncementsService>;
@@ -62,6 +63,8 @@ describe('AnnouncementsResolver', () => {
         app = module.createNestApplication({
             logger: false,
         });
+
+        appSetup(app);
 
         await app.init();
     });
