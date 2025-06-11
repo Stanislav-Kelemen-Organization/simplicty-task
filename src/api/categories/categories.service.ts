@@ -1,9 +1,4 @@
-import {
-    BadRequestException,
-    Injectable,
-    InternalServerErrorException,
-    Logger,
-} from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 
@@ -22,64 +17,40 @@ export class CategoriesService {
     ) {}
 
     public async find(): Promise<Category[]> {
-        try {
-            return await this.categoryRepository.find();
-        } catch (error) {
-            this.logger.error(error);
-
-            throw new InternalServerErrorException({
-                message: 'Categories fetch failed',
-            });
-        }
+        return await this.categoryRepository.find();
     }
 
     public async create(input: CreateCategoryInput): Promise<Category> {
-        try {
-            return await this.categoryRepository.save(input);
-        } catch (error) {
-            this.logger.error(error);
-
-            throw new InternalServerErrorException({
-                message: 'Category creation failed',
-            });
-        }
+        return await this.categoryRepository.save(input);
     }
 
     public async update(input: UpdateCategoryInput): Promise<Category> {
-        try {
-            return await this.dataSource.transaction(async (transaction) => {
-                const { id } = await transaction.save(Category, {
-                    ...input,
-                    updatedAt: new Date(),
-                });
-
-                return transaction.findOneOrFail(Category, {
-                    where: { id },
-                });
+        return await this.dataSource.transaction(async (transaction) => {
+            const isCategoryExisting = await transaction.exists(Category, {
+                where: { id: input.id },
             });
-        } catch (error) {
-            this.logger.error(error);
 
-            throw new InternalServerErrorException({
-                message: 'Category update failed',
+            if (!isCategoryExisting) {
+                throw new NotFoundException('Category does not exist');
+            }
+
+            const { id } = await transaction.save(Category, {
+                ...input,
+                updatedAt: new Date(),
             });
-        }
+
+            return transaction.findOneOrFail(Category, {
+                where: { id },
+            });
+        });
     }
 
     public async delete(id: number): Promise<boolean> {
         if (!(await this.categoryRepository.exists({ where: { id } }))) {
-            throw new BadRequestException('Category does not exist');
+            throw new NotFoundException('Category does not exist');
         }
 
-        try {
-            await this.categoryRepository.delete({ id });
-        } catch (error) {
-            this.logger.error(error);
-
-            throw new InternalServerErrorException({
-                message: 'Category deletion failed',
-            });
-        }
+        await this.categoryRepository.delete({ id });
 
         return true;
     }

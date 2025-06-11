@@ -1,8 +1,10 @@
-import { Field, InputType, Int, PartialType } from '@nestjs/graphql';
-import { CreateCategoryInput } from '.';
+import { Field, InputType, Int } from '@nestjs/graphql';
 
 @InputType()
-export class UpdateCategoryInput extends PartialType(CreateCategoryInput) {
+export class UpdateCategoryInput {
+    @Field({ nullable: true })
+    name: string;
+
     @Field(() => Int)
     id: number;
 }

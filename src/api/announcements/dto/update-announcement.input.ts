@@ -1,10 +1,19 @@
-import { Field, InputType, Int, PartialType } from '@nestjs/graphql';
-import { CreateAnnouncementInput } from './create-announcement.input';
+import { Field, InputType, Int } from '@nestjs/graphql';
 
 @InputType()
-export class UpdateAnnouncementInput extends PartialType(
-    CreateAnnouncementInput,
-) {
+export class UpdateAnnouncementInput {
+    @Field({ nullable: true })
+    title?: string;
+
+    @Field({ nullable: true })
+    content?: string;
+
+    @Field({ nullable: true })
+    publishedAt?: Date;
+
+    @Field(() => [Int], { nullable: true })
+    categoryIds?: number[];
+
     @Field(() => Int)
     id: number;
 }

@@ -7,7 +7,7 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-import { Category } from '../../categories/models/category.model';
+import { Category } from '../../categories/models';
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 
 @Entity()
